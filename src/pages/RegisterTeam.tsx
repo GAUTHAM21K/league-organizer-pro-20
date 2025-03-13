@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '@/components/layout/Navbar';
+import { Navbar } from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,24 +14,6 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentToggle } from '@/components/ui/tournament-toggle';
 import { Users, Upload, Info, Check } from 'lucide-react';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const formSchema = z.object({
   teamName: z.string().min(3, { message: "Team name must be at least 3 characters" }),
@@ -67,7 +48,6 @@ const RegisterTeam = () => {
     },
   });
 
-  // Update the tournament value when tournamentType changes
   useEffect(() => {
     if (tournamentType === "asl") {
       form.setValue("tournament", "asl");
@@ -102,7 +82,6 @@ const RegisterTeam = () => {
   function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       toast({
@@ -110,7 +89,6 @@ const RegisterTeam = () => {
         description: `Your team has been registered for the ${values.tournament === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}.`,
       });
       console.log(values);
-      // Reset form and step
       form.reset();
       setStep(1);
       setLogoPreview(null);
@@ -137,7 +115,6 @@ const RegisterTeam = () => {
               isVisible ? "opacity-100 transform-none" : "opacity-0 translate-y-8"
             )}
           >
-            {/* Tournament selection */}
             <div className="mb-8 flex flex-col items-center justify-center">
               <div className="text-center mb-4">
                 <h3 className="text-base font-medium text-gray-700">Select Tournament</h3>
@@ -148,7 +125,6 @@ const RegisterTeam = () => {
               />
             </div>
             
-            {/* Step indicators */}
             <div className="mb-8">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col items-center">

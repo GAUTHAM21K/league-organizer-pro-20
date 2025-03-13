@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import Navbar from '@/components/layout/Navbar';
+import { Navbar } from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,21 +14,6 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/components/auth/ProtectedRoute';
 import { Switch } from "@/components/ui/switch";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -49,7 +33,6 @@ const SignIn = () => {
   const location = useLocation();
   const { signIn } = useAuth();
 
-  // Get the intended destination or default to home
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
   const form = useForm<FormValues>({
@@ -64,12 +47,9 @@ const SignIn = () => {
   function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       
-      // Mock authentication for demo - In real app use actual auth
-      // Admin users have specific emails for demo
       const role = values.isAdmin ? 'admin' : 'user';
       signIn(role);
 
@@ -80,7 +60,6 @@ const SignIn = () => {
           "Welcome back to Ahalia Tournaments.",
       });
 
-      // Redirect to the appropriate page
       if (values.isAdmin) {
         navigate('/admin');
       } else {

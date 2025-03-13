@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
-import Navbar from '@/components/layout/Navbar';
+import { Navbar } from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { DataTable } from '@/components/ui/DataTable';
 import { Input } from '@/components/ui/input';
