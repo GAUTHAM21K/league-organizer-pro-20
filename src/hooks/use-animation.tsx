@@ -49,7 +49,7 @@ export function useSequentialAnimation(
 ) {
   const { delay = 100, interval = 100, threshold = 0.1 } = options;
   const [visibleItems, setVisibleItems] = useState<boolean[]>(Array(itemCount).fill(false));
-  const containerRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const currentContainer = containerRef.current;
