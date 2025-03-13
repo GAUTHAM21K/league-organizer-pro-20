@@ -14,6 +14,24 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentToggle } from '@/components/ui/tournament-toggle';
 import { Users, Upload, Info, Check } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   teamName: z.string().min(3, { message: "Team name must be at least 3 characters" }),
