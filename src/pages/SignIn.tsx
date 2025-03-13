@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Navbar } from '@/components/layout/Navbar';
+import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { LogIn, Shield, User } from 'lucide-react';
 import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -42,6 +49,7 @@ const SignIn = () => {
   const location = useLocation();
   const { signIn } = useAuth();
 
+  // Get the intended destination or default to home
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
   const form = useForm<FormValues>({
@@ -56,11 +64,14 @@ const SignIn = () => {
   function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     
+    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       
-      // Fixing the error: signIn() takes no arguments
-      signIn();
+      // Mock authentication for demo - In real app use actual auth
+      // Admin users have specific emails for demo
+      const role = values.isAdmin ? 'admin' : 'user';
+      signIn(role);
 
       toast({
         title: "Signed in successfully!",
@@ -69,6 +80,7 @@ const SignIn = () => {
           "Welcome back to Ahalia Tournaments.",
       });
 
+      // Redirect to the appropriate page
       if (values.isAdmin) {
         navigate('/admin');
       } else {

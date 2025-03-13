@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogIn, Trophy, Image } from 'lucide-react';
+import { Menu, X, LogIn, User, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,6 @@ const Navbar = () => {
     { name: 'Matches', path: '/matches' },
     { name: 'Players', path: '/players' },
     { name: 'Statistics', path: '/statistics' },
-    { name: 'Gallery', path: '/gallery' },
   ];
 
   useEffect(() => {
@@ -82,7 +81,7 @@ const Navbar = () => {
             <Link to="/sign-in">
               <Button variant="outline" size="sm" className="gap-2">
                 <LogIn size={16} />
-                Admin Login
+                Sign In
               </Button>
             </Link>
             <Link to="/register-team">
@@ -140,7 +139,7 @@ const Navbar = () => {
             <Link to="/sign-in">
               <Button variant="outline" className="w-full gap-2">
                 <LogIn size={16} />
-                Admin Login
+                Sign In
               </Button>
             </Link>
             <Link to="/register-team">
@@ -156,4 +155,4 @@ const Navbar = () => {
   );
 };
 
-export { Navbar };
+export default Navbar;
