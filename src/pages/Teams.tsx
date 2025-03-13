@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { DataTable } from '@/components/ui/DataTable';
@@ -87,7 +87,9 @@ const columns: ColumnDef<Team>[] = [
     accessorKey: 'name',
     header: 'Team Name',
     cell: ({ row }) => (
-      <div className="font-medium text-primary">{row.getValue('name')}</div>
+      <Link to={`/teams/${row.original.id}`} className="font-medium text-primary hover:underline">
+        {row.getValue('name')}
+      </Link>
     ),
   },
   {
@@ -127,9 +129,11 @@ const columns: ColumnDef<Team>[] = [
   {
     id: 'actions',
     cell: ({ row }) => (
-      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-        <ChevronRight className="h-4 w-4" />
-      </Button>
+      <Link to={`/teams/${row.original.id}`}>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </Link>
     ),
   },
 ];
