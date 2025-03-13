@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
@@ -13,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentToggle } from '@/components/ui/tournament-toggle';
-import { Users, Upload, Info, Check } from 'lucide-react';
+import { Users, Upload, Info, Check, Plus, Trash, UserPlus } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -32,6 +33,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { 
+  Card, 
+  CardContent 
+} from "@/components/ui/card";
+
+// Type for player positions based on tournament type
+type APLPosition = 'Batter' | 'Bowler' | 'All Rounder';
+type ASLPosition = 'Forward' | 'Midfielder' | 'Defender' | 'Goalkeeper';
+
+// Player type that can accommodate both tournament types
+interface Player {
+  id: number;
+  name: string;
+  position: ASLPosition | APLPosition;
+  jerseyNumber?: number;
+  age?: number;
+}
 
 const formSchema = z.object({
   teamName: z.string().min(3, { message: "Team name must be at least 3 characters" }),
@@ -48,10 +74,20 @@ type FormValues = z.infer<typeof formSchema>;
 const RegisterTeam = () => {
   const { ref, isVisible } = useAnimation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [tournamentType, setTournamentType] = useState("asl");
+  
+  // State for players
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<Omit<Player, 'id'>>({
+    name: '',
+    position: tournamentType === 'asl' ? 'Forward' : 'Batter',
+    jerseyNumber: undefined,
+    age: undefined
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -69,8 +105,18 @@ const RegisterTeam = () => {
   useEffect(() => {
     if (tournamentType === "asl") {
       form.setValue("tournament", "asl");
+      // Reset player position for ASL
+      setCurrentPlayer(prev => ({
+        ...prev,
+        position: 'Forward'
+      }));
     } else {
       form.setValue("tournament", "apl");
+      // Reset player position for APL
+      setCurrentPlayer(prev => ({
+        ...prev,
+        position: 'Batter'
+      }));
     }
   }, [tournamentType, form]);
 
@@ -85,19 +131,76 @@ const RegisterTeam = () => {
     }
   };
 
-  function onNextStep() {
-    form.trigger(['teamName', 'department', 'captainName', 'captainEmail', 'captainPhone']).then((isValid) => {
-      if (isValid) {
-        setStep(2);
-      }
+  const handlePlayerInputChange = (field: keyof Omit<Player, 'id'>, value: any) => {
+    setCurrentPlayer({
+      ...currentPlayer,
+      [field]: value
     });
+  };
+
+  const addPlayer = () => {
+    if (!currentPlayer.name) {
+      toast({
+        title: "Missing player name",
+        description: "Please enter the player's name",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newPlayer: Player = {
+      ...currentPlayer,
+      id: players.length + 1
+    };
+
+    setPlayers([...players, newPlayer]);
+    setCurrentPlayer({
+      name: '',
+      position: tournamentType === 'asl' ? 'Forward' : 'Batter',
+      jerseyNumber: undefined,
+      age: undefined
+    });
+  };
+
+  const removePlayer = (playerId: number) => {
+    setPlayers(players.filter(player => player.id !== playerId));
+  };
+
+  function onNextStep() {
+    if (step === 2 && players.length < 11) {
+      toast({
+        title: "Insufficient players",
+        description: `You need at least 11 players to register a team for ${tournamentType === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (step === 1) {
+      form.trigger(['teamName', 'department', 'captainName', 'captainEmail', 'captainPhone']).then((isValid) => {
+        if (isValid) {
+          setStep(2);
+        }
+      });
+    } else if (step === 2) {
+      setStep(3);
+    }
   }
 
   function onPrevStep() {
-    setStep(1);
+    setStep(step - 1);
   }
 
   function onSubmit(values: FormValues) {
+    if (players.length < 11) {
+      toast({
+        title: "Insufficient players",
+        description: `You need at least 11 players to register a team for ${tournamentType === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     setTimeout(() => {
@@ -106,10 +209,15 @@ const RegisterTeam = () => {
         title: "Team registered successfully!",
         description: `Your team has been registered for the ${values.tournament === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}.`,
       });
-      console.log(values);
+      console.log({
+        ...values,
+        players
+      });
       form.reset();
       setStep(1);
       setLogoPreview(null);
+      setPlayers([]);
+      navigate('/');
     }, 1500);
   }
 
@@ -165,7 +273,20 @@ const RegisterTeam = () => {
                   )}>
                     2
                   </div>
-                  <span className="text-sm mt-2">Tournament</span>
+                  <span className="text-sm mt-2">Players</span>
+                </div>
+                <div className={cn(
+                  "flex-1 h-1 mx-4",
+                  step >= 3 ? "bg-primary" : "bg-gray-200"
+                )} />
+                <div className="flex flex-col items-center">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium",
+                    step >= 3 ? "bg-primary text-white" : "bg-gray-200 text-gray-600"
+                  )}>
+                    3
+                  </div>
+                  <span className="text-sm mt-2">Review</span>
                 </div>
               </div>
             </div>
@@ -312,7 +433,7 @@ const RegisterTeam = () => {
                     
                     <div className="pt-4 flex justify-end">
                       <Button type="button" onClick={onNextStep}>
-                        Continue
+                        Continue to Players
                       </Button>
                     </div>
                   </>
@@ -333,15 +454,158 @@ const RegisterTeam = () => {
                     />
                     
                     <div className="p-5 bg-gray-50 rounded-lg mb-6">
-                      <h3 className="text-lg font-medium mb-2">Selected Tournament</h3>
-                      <div className="flex items-center gap-2 text-primary font-medium">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Users size={16} className="text-primary" />
+                      <h3 className="text-lg font-medium mb-2">Team Players - {tournamentType.toUpperCase()}</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Add at least 11 players to your team. Include their positions and details.
+                      </p>
+                      
+                      <Card className="mb-6">
+                        <CardContent className="pt-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <Label htmlFor="player-name">Player Name</Label>
+                              <Input
+                                id="player-name"
+                                value={currentPlayer.name}
+                                onChange={(e) => handlePlayerInputChange('name', e.target.value)}
+                                placeholder="Enter player name"
+                                className="mt-1"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="player-position">Position</Label>
+                              <Select
+                                value={currentPlayer.position}
+                                onValueChange={(value) => handlePlayerInputChange('position', value)}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select position" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {tournamentType === 'asl' ? (
+                                    <>
+                                      <SelectItem value="Forward">Forward (FW)</SelectItem>
+                                      <SelectItem value="Midfielder">Midfielder (MF)</SelectItem>
+                                      <SelectItem value="Defender">Defender (DF)</SelectItem>
+                                      <SelectItem value="Goalkeeper">Goalkeeper (GK)</SelectItem>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <SelectItem value="Batter">Batter</SelectItem>
+                                      <SelectItem value="Bowler">Bowler</SelectItem>
+                                      <SelectItem value="All Rounder">All Rounder</SelectItem>
+                                    </>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                              <Label htmlFor="player-jersey">Jersey Number</Label>
+                              <Input
+                                id="player-jersey"
+                                value={currentPlayer.jerseyNumber || ''}
+                                onChange={(e) => handlePlayerInputChange('jerseyNumber', parseInt(e.target.value) || undefined)}
+                                placeholder="Optional"
+                                type="number"
+                                className="mt-1"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="player-age">Age</Label>
+                              <Input
+                                id="player-age"
+                                value={currentPlayer.age || ''}
+                                onChange={(e) => handlePlayerInputChange('age', parseInt(e.target.value) || undefined)}
+                                placeholder="Optional"
+                                type="number"
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          
+                          <Button 
+                            type="button" 
+                            onClick={addPlayer}
+                            className="w-full"
+                          >
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Add Player
+                          </Button>
+                        </CardContent>
+                      </Card>
+                      
+                      {players.length > 0 ? (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>#</TableHead>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Position</TableHead>
+                              <TableHead>Jersey</TableHead>
+                              <TableHead className="text-right">Action</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {players.map((player) => (
+                              <TableRow key={player.id}>
+                                <TableCell>{player.id}</TableCell>
+                                <TableCell className="font-medium">{player.name}</TableCell>
+                                <TableCell>
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                                    {player.position}
+                                  </span>
+                                </TableCell>
+                                <TableCell>{player.jerseyNumber || '-'}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => removePlayer(player.id)}
+                                  >
+                                    <Trash className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No players added yet. Add at least 11 players to continue.
                         </div>
-                        {tournamentType === "asl" ? "Ahalia Soccer League (ASL)" : "Ahalia Premier League (APL)"}
+                      )}
+                      
+                      <div className="flex items-center justify-between mt-4">
+                        <div className={cn(
+                          "text-sm font-medium",
+                          players.length < 11 ? "text-red-500" : "text-green-500"
+                        )}>
+                          {players.length} of 11 required players
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Maximum 18 players
+                        </div>
                       </div>
                     </div>
                     
+                    <div className="pt-4 flex items-center justify-between">
+                      <Button type="button" variant="outline" onClick={onPrevStep}>
+                        Back
+                      </Button>
+                      <Button type="button" onClick={onNextStep}>
+                        Continue to Review
+                      </Button>
+                    </div>
+                  </>
+                )}
+                
+                {step === 3 && (
+                  <>
                     <FormField
                       control={form.control}
                       name="teamDescription"
@@ -363,7 +627,38 @@ const RegisterTeam = () => {
                       )}
                     />
                     
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 flex gap-3">
+                    <div className="p-5 bg-gray-50 rounded-lg mt-6">
+                      <h3 className="text-lg font-medium mb-4">Team Summary</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="font-medium">Team Name:</span>
+                          <span>{form.getValues("teamName")}</span>
+                        </div>
+                        
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="font-medium">Department:</span>
+                          <span>{form.getValues("department")}</span>
+                        </div>
+                        
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="font-medium">Captain:</span>
+                          <span>{form.getValues("captainName")}</span>
+                        </div>
+                        
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="font-medium">Tournament:</span>
+                          <span>{tournamentType === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}</span>
+                        </div>
+                        
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="font-medium">Players:</span>
+                          <span>{players.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 flex gap-3 mt-6">
                       <div className="flex-shrink-0 text-blue-500">
                         <Info size={20} />
                       </div>
