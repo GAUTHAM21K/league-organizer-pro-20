@@ -1,10 +1,10 @@
+
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { LogIn, Shield, User } from 'lucide-react';
 import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
@@ -59,8 +59,8 @@ const SignIn = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       
-      const role = values.isAdmin ? 'admin' : 'user';
-      signIn(role);
+      // Fixing the error: signIn() takes no arguments
+      signIn();
 
       toast({
         title: "Signed in successfully!",
