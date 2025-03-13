@@ -13,11 +13,13 @@ import {
   Settings, 
   LogOut, 
   ChevronRight, 
-  Bell
+  Bell,
+  Image
 } from 'lucide-react';
 import AdminScheduler from './AdminScheduler';
 import AdminTeams from './AdminTeams';
 import AdminScores from './AdminScores';
+import AdminGallery from './AdminGallery';
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -44,6 +46,11 @@ const AdminDashboard = () => {
       name: 'Live Scores', 
       path: '/admin/scores', 
       icon: <Trophy size={20} /> 
+    },
+    { 
+      name: 'Gallery', 
+      path: '/admin/gallery', 
+      icon: <Image size={20} /> 
     },
     { 
       name: 'Settings', 
@@ -156,6 +163,9 @@ const AdminDashboard = () => {
             } />
             <Route path="/scores" element={
               <AdminScores tournamentType={tournamentType} />
+            } />
+            <Route path="/gallery" element={
+              <AdminGallery tournamentType={tournamentType} />
             } />
             <Route path="/settings" element={
               <div>Settings Content</div>

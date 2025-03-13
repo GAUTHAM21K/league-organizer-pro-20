@@ -12,6 +12,7 @@ import Matches from "./pages/Matches";
 import MatchDetail from "./pages/MatchDetail";
 import Players from "./pages/Players";
 import Statistics from "./pages/Statistics";
+import Gallery from "./pages/Gallery";
 import SignIn from "./pages/SignIn";
 import RegisterTeam from "./pages/RegisterTeam";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -33,15 +34,9 @@ const App = () => (
           <Route path="/matches/:id" element={<MatchDetail />} />
           <Route path="/players" element={<Players />} />
           <Route path="/statistics" element={<Statistics />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/sign-in" element={<SignIn />} />
-          <Route 
-            path="/register-team" 
-            element={
-              <ProtectedRoute>
-                <RegisterTeam />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/register-team" element={<RegisterTeam />} />
           <Route 
             path="/admin/*" 
             element={
