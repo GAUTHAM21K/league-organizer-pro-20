@@ -1,8 +1,6 @@
-
 import { useSequentialAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
 import { Calendar, LineChart, Users, Trophy, Activity, Clock, Bell, Smartphone } from 'lucide-react';
-
 interface FeatureCardProps {
   title: string;
   description: string;
@@ -10,7 +8,6 @@ interface FeatureCardProps {
   isVisible: boolean;
   delay?: number;
 }
-
 const FeatureCard = ({
   title,
   description,
@@ -34,50 +31,39 @@ const FeatureCard = ({
       </div>
     </div>;
 };
-
-const features = [
-  {
-    icon: <Users size={24} />,
-    title: "Team Registration",
-    description: "Streamlined team and player registration with digital profiles and credential verification."
-  }, 
-  {
-    icon: <Calendar size={24} />,
-    title: "Match Scheduling",
-    description: "Intelligent scheduling system that avoids conflicts and optimizes venue usage."
-  }, 
-  {
-    icon: <Trophy size={24} />,
-    title: "Result Management",
-    description: "Instantly update match results and tournament standings with automatic calculations."
-  }, 
-  {
-    icon: <LineChart size={24} />,
-    title: "Player Statistics",
-    description: "Track and visualize detailed player performance metrics throughout tournaments."
-  }, 
-  {
-    icon: <Activity size={24} />,
-    title: "Live Updates",
-    description: "Real-time updates for ongoing matches with play-by-play commentary and stats."
-  }, 
-  {
-    icon: <Clock size={24} />,
-    title: "Time Management",
-    description: "Automated time tracking for matches with notifications for upcoming events."
-  }, 
-  {
-    icon: <Bell size={24} />,
-    title: "Notifications",
-    description: "Instant notifications for schedule changes, results, and important tournament updates."
-  }, 
-  {
-    icon: <Smartphone size={24} />,
-    title: "Mobile Responsive",
-    description: "Access all features on any device with a seamless, responsive design experience."
-  }
-];
-
+const features = [{
+  icon: <Users size={24} />,
+  title: "Team Registration",
+  description: "Streamlined team and player registration with digital profiles and credential verification."
+}, {
+  icon: <Calendar size={24} />,
+  title: "Match Scheduling",
+  description: "Intelligent scheduling system that avoids conflicts and optimizes venue usage."
+}, {
+  icon: <Trophy size={24} />,
+  title: "Result Management",
+  description: "Instantly update match results and tournament standings with automatic calculations."
+}, {
+  icon: <LineChart size={24} />,
+  title: "Player Statistics",
+  description: "Track and visualize detailed player performance metrics throughout tournaments."
+}, {
+  icon: <Activity size={24} />,
+  title: "Live Updates",
+  description: "Real-time updates for ongoing matches with play-by-play commentary and stats."
+}, {
+  icon: <Clock size={24} />,
+  title: "Time Management",
+  description: "Automated time tracking for matches with notifications for upcoming events."
+}, {
+  icon: <Bell size={24} />,
+  title: "Notifications",
+  description: "Instant notifications for schedule changes, results, and important tournament updates."
+}, {
+  icon: <Smartphone size={24} />,
+  title: "Mobile Responsive",
+  description: "Access all features on any device with a seamless, responsive design experience."
+}];
 const FeatureSection = () => {
   const {
     containerRef,
@@ -87,31 +73,6 @@ const FeatureSection = () => {
     interval: 100,
     threshold: 0.1
   });
-
-  return (
-    <section ref={containerRef} className="bg-gray-50 py-20">
-      <div className="container max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Powerful Tournament Management Features</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Everything you need to run successful sports tournaments from registration to results
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <FeatureCard 
-              key={feature.title}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-              isVisible={visibleItems[index]}
-              delay={index * 100}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return;
 };
-
 export default FeatureSection;
