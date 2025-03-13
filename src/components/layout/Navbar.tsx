@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogIn, User, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -78,10 +78,18 @@ const Navbar = () => {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm">Register Team</Button>
+            <Link to="/sign-in">
+              <Button variant="outline" size="sm" className="gap-2">
+                <LogIn size={16} />
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/register-team">
+              <Button size="sm" className="gap-2">
+                <Trophy size={16} />
+                Register Team
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -128,12 +136,18 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="mt-6 space-y-3 px-4">
-            <Button variant="outline" className="w-full">
-              Sign In
-            </Button>
-            <Button className="w-full">
-              Register Team
-            </Button>
+            <Link to="/sign-in">
+              <Button variant="outline" className="w-full gap-2">
+                <LogIn size={16} />
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/register-team">
+              <Button className="w-full gap-2">
+                <Trophy size={16} />
+                Register Team
+              </Button>
+            </Link>
           </div>
         </nav>
       </div>

@@ -10,6 +10,10 @@ import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
 import Matches from "./pages/Matches";
 import MatchDetail from "./pages/MatchDetail";
+import Players from "./pages/Players";
+import Statistics from "./pages/Statistics";
+import SignIn from "./pages/SignIn";
+import RegisterTeam from "./pages/RegisterTeam";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/teams/:id" element={<TeamDetail />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/matches/:id" element={<MatchDetail />} />
+          <Route path="/players" element={<Players />} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/register-team" element={<RegisterTeam />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
