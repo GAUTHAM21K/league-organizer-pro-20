@@ -8,13 +8,15 @@ import { Button } from '@/components/ui/button';
 import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronRight, Filter } from 'lucide-react';
+import { TournamentToggle } from '@/components/ui/tournament-toggle';
 
 // Sample data
 const matches = [
   {
     id: '1',
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     teamA: 'Engineering Tigers',
     teamB: 'Medicine United',
     scoreA: null,
@@ -27,6 +29,7 @@ const matches = [
   {
     id: '2',
     tournament: 'Ahalia Premier League',
+    tournamentCode: 'apl',
     teamA: 'Science Strikers',
     teamB: 'Arts Avengers',
     scoreA: null,
@@ -39,6 +42,7 @@ const matches = [
   {
     id: '3',
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     teamA: 'Commerce Titans',
     teamB: 'Pharmacy Phoenix',
     scoreA: 2,
@@ -51,6 +55,7 @@ const matches = [
   {
     id: '4',
     tournament: 'Ahalia Premier League',
+    tournamentCode: 'apl',
     teamA: 'Science Strikers',
     teamB: 'Commerce Titans',
     scoreA: 5,
@@ -63,6 +68,7 @@ const matches = [
   {
     id: '5',
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     teamA: 'Medicine United',
     teamB: 'Arts Avengers',
     scoreA: 3,
@@ -75,6 +81,7 @@ const matches = [
   {
     id: '6',
     tournament: 'Ahalia Premier League',
+    tournamentCode: 'apl',
     teamA: 'Engineering Tigers',
     teamB: 'Pharmacy Phoenix',
     scoreA: 4,
@@ -182,12 +189,23 @@ const columns: ColumnDef<Match>[] = [
 const Matches = () => {
   const { ref, isVisible } = useAnimation();
   const [activeTab, setActiveTab] = useState('all');
+  const [tournamentType, setTournamentType] = useState("all");
 
-  // Filter matches based on the active tab
-  const filteredMatches = 
-    activeTab === 'all' ? matches :
-    activeTab === 'upcoming' ? matches.filter(match => match.status === 'upcoming') :
-    matches.filter(match => match.status === 'completed');
+  // Filter matches based on both the active tab and tournament type
+  const filteredMatches = matches.filter(match => {
+    // Filter by status
+    const statusMatch = 
+      activeTab === 'all' ? true :
+      activeTab === 'upcoming' ? match.status === 'upcoming' :
+      match.status === 'completed';
+    
+    // Filter by tournament
+    const tournamentMatch = 
+      tournamentType === 'all' ? true : 
+      match.tournamentCode === tournamentType;
+    
+    return statusMatch && tournamentMatch;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -203,10 +221,35 @@ const Matches = () => {
                   View all scheduled and completed matches
                 </p>
               </div>
-              <Button>
-                Schedule New Match
-              </Button>
+              <Link to="/admin">
+                <Button>
+                  Schedule New Match
+                </Button>
+              </Link>
             </div>
+          </div>
+          
+          {/* Tournament toggle */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-gray-700">Tournament:</span>
+              <TournamentToggle 
+                value={tournamentType !== "all" ? tournamentType : ""}
+                onValueChange={(value) => setTournamentType(value || "all")}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={cn(
+                "gap-2",
+                tournamentType === "all" ? "bg-primary/10 border-primary/20 text-primary" : ""
+              )}
+              onClick={() => setTournamentType("all")}
+            >
+              <Filter size={16} />
+              Show All Matches
+            </Button>
           </div>
           
           {/* Status filter tabs */}

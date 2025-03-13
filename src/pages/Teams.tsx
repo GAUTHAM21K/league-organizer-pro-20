@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -8,6 +9,7 @@ import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
 import { type ColumnDef } from '@tanstack/react-table';
 import { ChevronRight, Users, Trophy, Calendar } from 'lucide-react';
+import { TournamentToggle } from '@/components/ui/tournament-toggle';
 
 // Sample data
 const teams = [
@@ -17,6 +19,7 @@ const teams = [
     captain: 'Alex Johnson',
     players: 15,
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     wins: 4,
     losses: 1,
     draws: 2,
@@ -28,6 +31,7 @@ const teams = [
     captain: 'Sam Williams',
     players: 14,
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     wins: 5,
     losses: 1,
     draws: 1,
@@ -39,6 +43,7 @@ const teams = [
     captain: 'Jamie Taylor',
     players: 16,
     tournament: 'Ahalia Premier League',
+    tournamentCode: 'apl',
     wins: 3,
     losses: 2,
     draws: 1,
@@ -50,6 +55,7 @@ const teams = [
     captain: 'Jordan Smith',
     players: 15,
     tournament: 'Ahalia Premier League',
+    tournamentCode: 'apl',
     wins: 4,
     losses: 0,
     draws: 2,
@@ -61,6 +67,7 @@ const teams = [
     captain: 'Casey Brown',
     players: 14,
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     wins: 2,
     losses: 3,
     draws: 2,
@@ -72,6 +79,7 @@ const teams = [
     captain: 'Riley Martinez',
     players: 15,
     tournament: 'Ahalia Soccer League',
+    tournamentCode: 'asl',
     wins: 3,
     losses: 2,
     draws: 2,
@@ -140,12 +148,12 @@ const columns: ColumnDef<Team>[] = [
 
 const Teams = () => {
   const { ref, isVisible } = useAnimation();
-  const [activeTab, setActiveTab] = useState('all');
+  const [tournamentType, setTournamentType] = useState("all");
 
-  // Filter teams based on the active tab
-  const filteredTeams = activeTab === 'all' 
+  // Filter teams based on the tournament type
+  const filteredTeams = tournamentType === 'all' 
     ? teams 
-    : teams.filter(team => team.tournament.toLowerCase().includes(activeTab));
+    : teams.filter(team => team.tournamentCode === tournamentType);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -161,47 +169,35 @@ const Teams = () => {
                   Browse all registered teams and their performance
                 </p>
               </div>
-              <Button>
-                Register New Team
-              </Button>
+              <Link to="/register-team">
+                <Button>
+                  Register New Team
+                </Button>
+              </Link>
             </div>
           </div>
           
-          {/* Tournament filter tabs */}
-          <div className="flex overflow-x-auto mb-6 border-b border-gray-200">
-            <button
+          {/* Tournament toggle */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-gray-700">Tournament:</span>
+              <TournamentToggle 
+                value={tournamentType !== "all" ? tournamentType : ""}
+                onValueChange={(value) => setTournamentType(value || "all")}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
               className={cn(
-                "mr-6 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                activeTab === 'all'
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                "gap-2",
+                tournamentType === "all" ? "bg-primary/10 border-primary/20 text-primary" : ""
               )}
-              onClick={() => setActiveTab('all')}
+              onClick={() => setTournamentType("all")}
             >
-              All Teams
-            </button>
-            <button
-              className={cn(
-                "mr-6 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                activeTab === 'soccer'
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              )}
-              onClick={() => setActiveTab('soccer')}
-            >
-              Soccer League
-            </button>
-            <button
-              className={cn(
-                "mr-6 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                activeTab === 'premier'
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              )}
-              onClick={() => setActiveTab('premier')}
-            >
-              Premier League
-            </button>
+              <Users size={16} />
+              Show All Teams
+            </Button>
           </div>
           
           <div 
@@ -229,7 +225,7 @@ const Teams = () => {
                 </div>
               </div>
               <div className="flex items-end">
-                <span className="text-3xl font-bold text-gray-900">{teams.length}</span>
+                <span className="text-3xl font-bold text-gray-900">{filteredTeams.length}</span>
                 <span className="ml-2 text-sm text-gray-500">teams registered</span>
               </div>
             </div>
@@ -242,8 +238,20 @@ const Teams = () => {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xl font-bold text-gray-900">Medicine United</div>
-                <div className="text-sm text-gray-500">16 points • 5 wins</div>
+                <div className="text-xl font-bold text-gray-900">
+                  {tournamentType === "apl" 
+                    ? "Arts Avengers" 
+                    : tournamentType === "asl" 
+                      ? "Medicine United" 
+                      : "Medicine United"}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {tournamentType === "apl" 
+                    ? "14 points • 4 wins" 
+                    : tournamentType === "asl" 
+                      ? "16 points • 5 wins" 
+                      : "16 points • 5 wins"}
+                </div>
               </div>
             </div>
             

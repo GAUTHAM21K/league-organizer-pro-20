@@ -1,5 +1,6 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { TournamentToggle } from '@/components/ui/tournament-toggle';
 import { Users, Upload, Info, Check } from 'lucide-react';
 import {
   Form,
@@ -50,6 +52,7 @@ const RegisterTeam = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [tournamentType, setTournamentType] = useState("asl");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,6 +66,15 @@ const RegisterTeam = () => {
       teamDescription: "",
     },
   });
+
+  // Update the tournament value when tournamentType changes
+  useEffect(() => {
+    if (tournamentType === "asl") {
+      form.setValue("tournament", "asl");
+    } else {
+      form.setValue("tournament", "apl");
+    }
+  }, [tournamentType, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,7 +107,7 @@ const RegisterTeam = () => {
       setIsSubmitting(false);
       toast({
         title: "Team registered successfully!",
-        description: "Your team has been registered for the tournament.",
+        description: `Your team has been registered for the ${values.tournament === "asl" ? "Ahalia Soccer League" : "Ahalia Premier League"}.`,
       });
       console.log(values);
       // Reset form and step
@@ -125,6 +137,17 @@ const RegisterTeam = () => {
               isVisible ? "opacity-100 transform-none" : "opacity-0 translate-y-8"
             )}
           >
+            {/* Tournament selection */}
+            <div className="mb-8 flex flex-col items-center justify-center">
+              <div className="text-center mb-4">
+                <h3 className="text-base font-medium text-gray-700">Select Tournament</h3>
+              </div>
+              <TournamentToggle
+                value={tournamentType}
+                onValueChange={setTournamentType}
+              />
+            </div>
+            
             {/* Step indicators */}
             <div className="mb-8">
               <div className="flex items-center justify-between">
@@ -307,29 +330,23 @@ const RegisterTeam = () => {
                       control={form.control}
                       name="tournament"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tournament</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select tournament" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>Available Tournaments</SelectLabel>
-                                <SelectItem value="asl">Ahalia Soccer League (ASL)</SelectItem>
-                                <SelectItem value="apl">Ahalia Premier League (APL)</SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
+                        <FormItem className="hidden">
+                          <FormControl>
+                            <Input type="hidden" {...field} />
+                          </FormControl>
                         </FormItem>
                       )}
                     />
+                    
+                    <div className="p-5 bg-gray-50 rounded-lg mb-6">
+                      <h3 className="text-lg font-medium mb-2">Selected Tournament</h3>
+                      <div className="flex items-center gap-2 text-primary font-medium">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Users size={16} className="text-primary" />
+                        </div>
+                        {tournamentType === "asl" ? "Ahalia Soccer League (ASL)" : "Ahalia Premier League (APL)"}
+                      </div>
+                    </div>
                     
                     <FormField
                       control={form.control}

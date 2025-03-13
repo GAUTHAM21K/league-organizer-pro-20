@@ -1,18 +1,20 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, Shield } from 'lucide-react';
+import { LogIn, Shield, User } from 'lucide-react';
 import { useAnimation } from '@/hooks/use-animation';
 import { cn } from '@/lib/utils';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/components/auth/ProtectedRoute';
+import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormControl,
@@ -22,12 +24,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { 
     message: "Password must be at least 6 characters" 
   }),
+  isAdmin: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -36,12 +45,19 @@ const SignIn = () => {
   const { ref, isVisible } = useAnimation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn } = useAuth();
+
+  // Get the intended destination or default to home
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+      isAdmin: false,
     },
   });
 
@@ -51,10 +67,26 @@ const SignIn = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
+      
+      // Mock authentication for demo - In real app use actual auth
+      // Admin users have specific emails for demo
+      const role = values.isAdmin ? 'admin' : 'user';
+      signIn(role);
+
       toast({
         title: "Signed in successfully!",
-        description: "Welcome back to Ahalia Tournaments.",
+        description: values.isAdmin ? 
+          "Welcome to the admin dashboard." : 
+          "Welcome back to Ahalia Tournaments.",
       });
+
+      // Redirect to the appropriate page
+      if (values.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate(from);
+      }
+      
       console.log(values);
     }, 1500);
   }
@@ -123,6 +155,27 @@ const SignIn = () => {
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isAdmin"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Admin Access</FormLabel>
+                        <FormDescription>
+                          Sign in as tournament administrator
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />

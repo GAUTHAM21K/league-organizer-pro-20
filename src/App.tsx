@@ -14,6 +14,8 @@ import Players from "./pages/Players";
 import Statistics from "./pages/Statistics";
 import SignIn from "./pages/SignIn";
 import RegisterTeam from "./pages/RegisterTeam";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +34,22 @@ const App = () => (
           <Route path="/players" element={<Players />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/register-team" element={<RegisterTeam />} />
+          <Route 
+            path="/register-team" 
+            element={
+              <ProtectedRoute>
+                <RegisterTeam />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute isAdmin={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
